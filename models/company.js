@@ -29,12 +29,13 @@ class Company {
    * 
    * query: the request.query object
    * 
-   * return: an array of the query object's keys to be used in the "findAll" method.
+   * keys: an array of the keys from the request.query object
+   * 
+   * return: null.
    * 
    */
-  static getQueryKeysAndCheckForBadQueries(query) {
+  static getQueryKeysAndCheckForBadQueries(query, keys) {
     const validParams = ["name", "minEmployees", "maxEmployees"];
-    const keys = Object.keys(query);
     const invalidKeys = keys.filter(k => validParams.indexOf(k) === -1);
     if (invalidKeys.length) throw new BadRequestError(`These parameters in your query 
                                                        string are invalid: [${invalidKeys}]`);
@@ -45,7 +46,6 @@ class Company {
         throw new BadRequestError("minEmployees cannot be greater than maxEmployees.");
       };
     };
-    return keys;
   };
 
   /** Create a company (from data), update db, return new company data.
@@ -104,7 +104,8 @@ class Company {
    * */
 
   static async findAll(query = null) {
-    const keys = this.getQueryKeysAndCheckForBadQueries(query);
+    const keys = Object.keys(query);
+    this.getQueryKeysAndCheckForBadQueries(query, keys);
     let queryKeys = keys.map((key, idx) => this.makeKeyStatementsForWhereClauses(key, idx)).join(" AND ");
 
     if (query.name) {
