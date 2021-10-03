@@ -18,11 +18,35 @@ class Company {
    */
 
   static makeKeyStatementsForWhereClauses(key, idx) {
-    console.log("hello!")
     if (key === "name") return ` ${key} ILIKE $${idx+1}`
     if (key === "minEmployees") return `num_employees >= $${idx+1}`
     if (key === "maxEmployees") return `num_employees <= $${idx+1}`
   }
+
+  /**
+   * Checking to make sure that the route's request query is valid, 
+   * and throwing errors if it isn't. 
+   * 
+   * query: the request.query object
+   * 
+   * return: an array of the query object's keys to be used in the "findAll" method.
+   * 
+   */
+  static getQueryKeysAndCheckForBadQueries(query) {
+    const validParams = ["name", "minEmployees", "maxEmployees"];
+    const keys = Object.keys(query);
+    const invalidKeys = keys.filter(k => validParams.indexOf(k) === -1);
+    if (invalidKeys.length) throw new BadRequestError(`These parameters in your query 
+                                                       string are invalid: [${invalidKeys}]`);
+    if (query.minEmployees && query.maxEmployees) {
+      const min = parseInt(query.minEmployees);
+      const max = parseInt(query.maxEmployees);
+      if (min > max) {
+        throw new BadRequestError("minEmployees cannot be greater than maxEmployees.");
+      };
+    };
+    return keys;
+  };
 
   /** Create a company (from data), update db, return new company data.
    *
@@ -80,13 +104,9 @@ class Company {
    * */
 
   static async findAll(query = null) {
-    const validParams = ["name", "minEmployees", "maxEmployees"];
-    const keys = Object.keys(query);
-    const invalidKeys = keys.filter(k => validParams.indexOf(k) === -1);
-    if (invalidKeys.length) throw new BadRequestError(`These parameters in your query 
-                                                       string are invalid: [${invalidKeys}]`);
-    
-    if (!query) {
+    const keys = this.getQueryKeysAndCheckForBadQueries(query);
+  
+    if (!keys.length) {
       const companiesRes = await db.query(
         `SELECT handle,
                 name,
