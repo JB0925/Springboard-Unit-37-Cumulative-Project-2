@@ -96,6 +96,59 @@ describe("GET /companies", function () {
     });
   });
 
+  test("works: good query string with all three parameters", async() => {
+    const queryString = {
+      name: "c",
+      minEmployees: 1,
+      maxEmployees: 5
+    };
+    const resp = await request(app).get("/companies").query(queryString);
+    expect(resp.statusCode).toBe(200);
+    expect(resp.body.companies[0].handle).toEqual("c1");
+  });
+
+  test("works: good query string with only minEmployees", async() => {
+    const queryString = {
+      minEmployees: 1
+    };
+    const resp = await request(app).get("/companies").query(queryString);
+    expect(resp.statusCode).toBe(200);
+    expect(resp.body.companies[1].handle).toEqual("c2");
+  });
+
+  test("works: good query string with only name and maxEmployees", async() => {
+    const queryString = {
+      name: "c",
+      maxEmployees: 1
+    };
+    const resp = await request(app).get("/companies").query(queryString);
+    expect(resp.statusCode).toBe(200);
+    expect(resp.body.companies[0].handle).toEqual("c1");
+    expect(resp.body.companies.length).toBe(1);
+  });
+
+  test("fails: query string has invalid key", async() => {
+    const queryString = {
+      name: "c",
+      maxEmployees: 1,
+      potato: "soup"
+    };
+    const resp = await request(app).get("/companies").query(queryString);
+    expect(resp.statusCode).toBe(400);
+    expect(resp.body.error.message).toContain("These parameters in your query");
+  });
+
+  test("fails: minEmployees > maxEmployees", async() => {
+    const queryString = {
+      name: "c",
+      minEmployees: 5,
+      maxEmployees: 1
+    };
+    const resp = await request(app).get("/companies").query(queryString);
+    expect(resp.statusCode).toBe(400);
+    expect(resp.body.error.message).toEqual("minEmployees cannot be greater than maxEmployees.");
+  });
+
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
     // thus making it hard to test that the error-handler works with it. This
