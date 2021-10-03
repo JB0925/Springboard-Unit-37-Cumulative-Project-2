@@ -34,7 +34,7 @@ class Company {
    * return: null.
    * 
    */
-  static getQueryKeysAndCheckForBadQueries(query, keys) {
+  static checkForBadQueries(query, keys) {
     const validParams = ["name", "minEmployees", "maxEmployees"];
     const invalidKeys = keys.filter(k => validParams.indexOf(k) === -1);
     if (invalidKeys.length) throw new BadRequestError(`These parameters in your query 
@@ -103,9 +103,9 @@ class Company {
    * 
    * */
 
-  static async findAll(query = null) {
+  static async findAll(query = {}) {
     const keys = Object.keys(query);
-    this.getQueryKeysAndCheckForBadQueries(query, keys);
+    this.checkForBadQueries(query, keys);
     let queryKeys = keys.map((key, idx) => this.makeKeyStatementsForWhereClauses(key, idx)).join(" AND ");
 
     if (query.name) {

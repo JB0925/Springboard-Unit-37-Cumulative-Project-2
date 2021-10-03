@@ -85,6 +85,100 @@ describe("findAll", function () {
       },
     ]);
   });
+  test("works: all three filter options", async() => {
+    const queryString = {
+      name: "c1",
+      minEmployees: 1,
+      maxEmployees: 5
+    };
+    const companies = await Company.findAll(queryString);
+    expect(companies).toEqual(
+      [
+        {
+          handle: "c1",
+          name: "C1",
+          description: "Desc1",
+          numEmployees: 1,
+          logoUrl: "http://c1.img"
+        }
+      ]
+    );
+  });
+  test("works: only using name filter", async() => {
+    const queryString = {
+      name: "c"
+    };
+    const companies = await Company.findAll(queryString);
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+  test("works: using name and minEmployees as filters", async() => {
+    const queryString = {
+      name: "c",
+      minEmployees: 2
+    };
+    const companies = await Company.findAll(queryString);
+    expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+  test("does not work: bad key in query", async() => {
+    const queryString = {
+      name: "c",
+      minEmployees: 1,
+      potato: "soup"
+    };
+    const keys = Object.keys(queryString);
+    await expect(async() => {
+      Company.checkForBadQueries(queryString, keys)
+    }
+    ).rejects.toThrow();
+  });
+  test("does not work: minEmployees > maxEmployees", async() => {
+    const queryString = {
+      name: "c",
+      minEmployees: 5,
+      maxEmployees: 1
+    };
+    const keys = Object.keys(queryString);
+    await expect(async() => {
+      await Company.checkForBadQueries(queryString, keys);
+    }).rejects.toThrow(new BadRequestError("minEmployees cannot be greater than maxEmployees."));
+  });
 });
 
 /************************************** get */
