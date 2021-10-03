@@ -105,36 +105,26 @@ class Company {
 
   static async findAll(query = null) {
     const keys = this.getQueryKeysAndCheckForBadQueries(query);
-  
-    if (!keys.length) {
-      const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-         FROM companies
-         ORDER BY name`);
-      return companiesRes.rows;
-    } else {
-      
-      let queryKeys = keys.map((key, idx) => this.makeKeyStatementsForWhereClauses(key, idx)).join(" AND ");
-      if (query.name) {
-        query.name = `%${query.name}%`
-      }
-      const values = Object.values(query);
-      const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-         FROM companies
-         WHERE ${queryKeys}
-         ORDER BY name`, [...values]);
-      return companiesRes.rows;
-    }
-  }
+    let queryKeys = keys.map((key, idx) => this.makeKeyStatementsForWhereClauses(key, idx)).join(" AND ");
+
+    if (query.name) {
+      query.name = `%${query.name}%`;
+    };
+
+    const values = Object.values(query);
+    let whereClause = queryKeys.length ? `WHERE ${queryKeys}` : "";
+
+    const companiesRes = await db.query(
+      `SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+        FROM companies
+        ${whereClause}
+        ORDER BY name`, [...values]);
+    return companiesRes.rows;
+  };
 
   /** Given a company handle, return data about company.
    *
