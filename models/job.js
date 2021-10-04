@@ -191,3 +191,5 @@ class Job {
     if (!job) throw new NotFoundError(`No company: ${title}`);
   };
 };
+
+module.exports = Job;
