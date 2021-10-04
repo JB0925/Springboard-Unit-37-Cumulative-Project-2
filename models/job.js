@@ -79,6 +79,15 @@ class Job {
   };
 
 
+  /** Method used to get all job data.
+   * 
+   * parameters:
+   *    query: the request.query object, or an empty object if there
+   *           is no request query
+   * 
+   * return: an array of all job listings
+   */
+
   static async findAll(query = {}) {
     const keys = Object.keys(query);
     this.checkForBadQueries(query, keys);
@@ -99,4 +108,86 @@ class Job {
   };
 
 
+  /** Method used to get a job with a specific title.
+   * 
+   * Parameters:
+   *    title: the title of the job to search for: a String
+   * 
+   * Return:
+   *    - if no job is found, raises NotFoundError
+   *    - otherwise, returns the data about the job
+   */
+
+  static async get(title) {
+    const result = await db.query(
+      `SELECT title, salary, equity, company_handle AS companyHandle
+       FROM jobs
+       WHERE title = $1`,
+       [title]
+    );
+
+    const job = result.rows[0];
+    if (!job) throw new NotFoundError(`No job with the following title: ${title}`);
+    return job;
+  };
+
+
+  /** Method used to update an existing job.
+   * 
+   * parameters:
+   *    title: the title of the job to uppdate: a String
+   *    data: all of the new data to update in the database: an Object
+   *      - data can include, but does not have to include, all of the following:
+   *          { title, salary, equity, companyHandle }
+   * 
+   * return:
+   *    raises NotFoundError if no job with that title is found
+   *    otherwise returns the job with updated data
+   */
+
+  static async update(title, data) {
+    const { setCols, values } = sqlForPartialUpdate(
+      data,
+      {
+        companyHandle: "company_handle",
+      });
+    const handleVarIdx = "$" + (values.length + 1);
+
+    const querySql = `UPDATE jobs 
+                      SET ${setCols} 
+                      WHERE title = ${handleVarIdx} 
+                      RETURNING title, 
+                                salary, 
+                                equity, 
+                                company_handle AS companyHandle`;
+    const result = await db.query(querySql, [...values, title]);
+    const job = result.rows[0];
+
+    if (!job) throw new NotFoundError(`No company: ${title}`);
+
+    return job;
+  }
+
+
+  /** Method used to delete jobs from the database.
+   * 
+   * Parameters:
+   *    -title: the title of the job to delete: a String
+   * 
+   * Return:
+   *    - raises NotFoundError if the job does not exists
+   *    - returns null otherwise
+   */
+
+  static async remove(title) {
+    const result = await db.query(
+          `DELETE
+           FROM jobs
+           WHERE title = $1
+           RETURNING title`,
+        [title]);
+    const job = result.rows[0];
+
+    if (!job) throw new NotFoundError(`No company: ${title}`);
+  };
 };
