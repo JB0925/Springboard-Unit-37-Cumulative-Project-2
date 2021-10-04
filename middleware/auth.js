@@ -59,8 +59,28 @@ function ensureLoggedInAndIsAdmin(req, res, next) {
 }
 
 
+/** Middleware to use on the GET, PATCH, and DELETE users routes.
+ * 
+ * If the user is not logged in and is not an admin OR not the user given
+ * in the request parameter, it will raise Unauthorized.
+ */
+
+function ensureLoggedInIsAdminOrUser(req, res, next) {
+  try {
+    if (!res.locals.user) throw new UnauthorizedError();
+    if (req.params.username !== res.locals.user.username && !res.locals.user.isAdmin) {
+      throw new UnauthorizedError();
+    };
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
-  ensureLoggedInAndIsAdmin
+  ensureLoggedInAndIsAdmin,
+  ensureLoggedInIsAdminOrUser
 };
