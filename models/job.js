@@ -24,10 +24,12 @@ class Job {
    * return: No return; modifies the array member in place
    */
 
-  static makeKeyStatementsForWhereClauses(key, idx) {
+  static makeKeyStatementsForWhereClauses(query, key, idx) {
+    const equityAmt = query.hasEquity === 'false' || !query.hasEquity ? '=' : '>';
+
     if (key === "title") return ` ${key} ILIKE $${idx+1}`
     if (key === "minSalary") return `salary >= $${idx+1}`
-    if (key === "hasEquity") return `equity = $${idx+1}`
+    if (key === "hasEquity") return `equity ${equityAmt} $${idx+1}`
   }
 
   /**
@@ -41,7 +43,8 @@ class Job {
    * return: null.
    * 
    */
-  static checkForBadQueries(query, keys) {
+  static checkForBadQueries(keys) {
+    console.log(keys)
     const validParams = ["title", "minSalary", "hasEquity"];
     const invalidKeys = keys.filter(k => validParams.indexOf(k) === -1);
     if (invalidKeys.length) throw new BadRequestError(`These parameters in your query 
@@ -90,11 +93,16 @@ class Job {
 
   static async findAll(query = {}) {
     const keys = Object.keys(query);
-    this.checkForBadQueries(query, keys);
-    let queryKeys = keys.map((key, idx) => this.makeKeyStatementsForWhereClauses(key, idx)).join(" AND ");
-
-    const values = Object.values(query);
+    this.checkForBadQueries(keys);
+    
+    let queryKeys = keys.map((key, idx) => this.makeKeyStatementsForWhereClauses(query, key, idx)).join(" AND ");
     let whereClause = queryKeys.length ? `WHERE ${queryKeys}` : "";
+
+    if (query.title) query.title = `%${query.title}%`;
+
+    const values = Object.values(query).filter(v => v !== 'false' && v !== 'true');
+    if (query.hasEquity !== undefined) values.push('0');
+    
 
     const results = await db.query(
       `SELECT title, salary, equity, company_handle AS companyHandle
