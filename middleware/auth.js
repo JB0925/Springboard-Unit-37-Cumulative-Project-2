@@ -43,7 +43,24 @@ function ensureLoggedIn(req, res, next) {
 }
 
 
+/** Middleware to use when a company is to be created, updated, or deleted.
+ * 
+ * If the user is not logged in AND is not the Admin, it will raise Unauthorized.
+*/
+
+function ensureLoggedInAndIsAdmin(req, res, next) {
+  try {
+    if (!res.locals.user) throw new UnauthorizedError();
+    if (!res.locals.user.isAdmin) throw new UnauthorizedError();
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
+  ensureLoggedInAndIsAdmin
 };
