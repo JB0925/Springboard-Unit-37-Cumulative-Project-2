@@ -10,6 +10,8 @@ async function commonBeforeAll() {
   await db.query("DELETE FROM users");
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM companies");
+  await db.query("DELETE FROM applications");
+  await db.query("DELETE FROM jobs");
 
   await Company.create(
       {
@@ -60,7 +62,7 @@ async function commonBeforeAll() {
     password: "password3",
     isAdmin: false,
   });
-}
+};
 
 async function commonBeforeEach() {
   await db.query("BEGIN");

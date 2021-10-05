@@ -12,6 +12,7 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
+  job1
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -117,6 +118,7 @@ describe("findAll", function () {
         lastName: "U1L",
         email: "u1@email.com",
         isAdmin: false,
+        jobApplicationsSubmitted: []
       },
       {
         username: "u2",
@@ -124,6 +126,7 @@ describe("findAll", function () {
         lastName: "U2L",
         email: "u2@email.com",
         isAdmin: false,
+        jobApplicationsSubmitted: []
       },
     ]);
   });
@@ -140,6 +143,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      jobApplicationsSubmitted: []
     });
   });
 
@@ -226,5 +230,37 @@ describe("remove", function () {
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
     }
+  });
+});
+
+
+/*************************************** apply */
+describe("apply", () => {
+  test("works", async() => {
+    const newJob = await db.query(
+      `INSERT INTO jobs
+       (title, salary, equity, company_handle)
+       VALUES
+       ('worker', 50000, 0.2, 'c3')`
+    );
+    
+    let jobId = await db.query(
+      `SELECT id
+       FROM jobs
+       WHERE title = $1`,
+       ["worker"]
+    );
+    jobId = jobId.rows[0].id;
+    await User.apply("u1", jobId);
+
+    const user = await User.get("u1");
+    expect(user).toEqual({
+      username: "u1",
+      firstName: "U1F",
+      lastName: "U1L",
+      email: "u1@email.com",
+      isAdmin: false,
+      jobApplicationsSubmitted: [parseInt(jobId)]
+    });
   });
 });
