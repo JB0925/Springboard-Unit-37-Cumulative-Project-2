@@ -14,6 +14,29 @@ const { BCRYPT_WORK_FACTOR } = require("../config.js");
 /** Related functions for users. */
 
 class User {
+
+  /** Get jobs the user has applied to from the database
+   * 
+   * Parameters:
+   *    username: the username to look for in the database
+   * 
+   * Returns: an array of job ids, i.e. [6, 10, 1, 13]
+   *    - if no jobs were applied to, returns an empty array
+   */
+  static async getJobsAppliedTo(username) {
+    const jobs = await db.query(
+      `SELECT username, job_id
+        FROM applications
+        WHERE username = $1`,
+        [username],
+    );
+    if (jobs) {
+      const appliedJobs = jobs.rows.map(j => j.job_id);
+      return appliedJobs;
+    };
+  };
+
+
   /** authenticate user with username, password.
    *
    * Returns { username, first_name, last_name, email, is_admin }
@@ -112,8 +135,12 @@ class User {
            ORDER BY username`,
     );
 
+    for (let user of result.rows) {
+      user.jobApplicationsSubmitted = await this.getJobsAppliedTo(user.username);
+    };
+  
     return result.rows;
-  }
+  };
 
   /** Given a username, return data about user.
    *
@@ -139,8 +166,9 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
+    user.jobApplicationsSubmitted = await this.getJobsAppliedTo(username);
     return user;
-  }
+  };
 
   /** Update user data with `data`.
    *
@@ -204,7 +232,29 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
-}
 
+  /** Allow user to submit job applications for existing jobs */
+
+  static async apply(username, job_id) {
+    const doesJobExist = await db.query(
+      `SELECT MAX(id)
+       FROM jobs`,
+    );
+    
+    const id = doesJobExist.rows[0].max;
+    if (parseInt(job_id) > parseInt(id)) throw new NotFoundError(`Job id ${job_id} is greater than the max job id of ${id}`);
+
+    const jobApplication = await db.query(
+      `INSERT INTO applications
+       (username, job_id)
+       VALUES
+       ($1, $2)
+       RETURNING job_id`,
+       [username, job_id]
+    );
+
+    return jobApplication.rows[0];
+  };
+};
 
 module.exports = User;
