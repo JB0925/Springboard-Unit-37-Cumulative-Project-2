@@ -31,7 +31,6 @@ const jobUpdateSchema = require("../schemas/jobUpdate.json");
       }
   
       const job = await Job.create(req.body);
-      console.log(job)
       return res.status(201).json({ job });
     } catch (err) {
       return next(err);
@@ -107,7 +106,7 @@ const jobUpdateSchema = require("../schemas/jobUpdate.json");
    * Authorization: login AND admin priviledges
    */
   
-  router.delete("/:handle", ensureLoggedInAndIsAdmin, async function (req, res, next) {
+  router.delete("/:title", ensureLoggedInAndIsAdmin, async function (req, res, next) {
     try {
       await Job.remove(req.params.title);
       return res.json({ deleted: req.params.title });

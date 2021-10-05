@@ -20,9 +20,7 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-let admin;
 let adminToken;
-let userToken2;
 beforeEach(async() => {
   const createAdmin = await db.query(
     `INSERT INTO users
@@ -33,7 +31,6 @@ beforeEach(async() => {
      ['newAdmin', 'cookies', 'new', 'Admin', 'newAdmin@gmail.com', true]
   );
   
-  admin = createAdmin.rows[0];
   adminToken = jwt.sign({username: "newAdmin", isAdmin: true}, SECRET_KEY);
 });
 
@@ -238,7 +235,7 @@ describe("PATCH /companies/:handle", function () {
     expect(resp.body.error.message).toBe("Unauthorized");
   });
 
-  test("works for users", async function () {
+  test("works for admin", async function () {
     const resp = await request(app)
         .patch(`/companies/c1`)
         .send({
