@@ -5,7 +5,7 @@ const express = require("express");
 const router = new express.Router();
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn, ensureLoggedInAndIsAdmin } = require("../middleware/auth");
+const { ensureLoggedInAndIsAdmin } = require("../middleware/auth");
 
 const Job = require("../models/job");
 
@@ -31,6 +31,7 @@ const jobUpdateSchema = require("../schemas/jobUpdate.json");
       }
   
       const job = await Job.create(req.body);
+      console.log(job)
       return res.status(201).json({ job });
     } catch (err) {
       return next(err);

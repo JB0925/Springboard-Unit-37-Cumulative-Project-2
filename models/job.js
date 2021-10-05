@@ -44,7 +44,6 @@ class Job {
    * 
    */
   static checkForBadQueries(keys) {
-    console.log(keys)
     const validParams = ["title", "minSalary", "hasEquity"];
     const invalidKeys = keys.filter(k => validParams.indexOf(k) === -1);
     if (invalidKeys.length) throw new BadRequestError(`These parameters in your query 
@@ -94,16 +93,15 @@ class Job {
   static async findAll(query = {}) {
     const keys = Object.keys(query);
     this.checkForBadQueries(keys);
-    
+
     let queryKeys = keys.map((key, idx) => this.makeKeyStatementsForWhereClauses(query, key, idx)).join(" AND ");
     let whereClause = queryKeys.length ? `WHERE ${queryKeys}` : "";
 
     if (query.title) query.title = `%${query.title}%`;
 
-    const values = Object.values(query).filter(v => v !== 'false' && v !== 'true');
+    const values = Object.values(query).filter(v => [true, false, 'true', 'false'].indexOf(v) === -1);
     if (query.hasEquity !== undefined) values.push('0');
     
-
     const results = await db.query(
       `SELECT title, salary, equity, company_handle AS companyHandle
        FROM jobs
