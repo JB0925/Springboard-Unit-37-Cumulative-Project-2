@@ -125,11 +125,20 @@ router.delete("/:username", ensureLoggedInIsAdminOrUser, async function (req, re
 });
 
 
-/** POST /:username/jobs/:id => { username: req.params.username, job_id: req.params.id }
+/** POST /:username/jobs/:id => { applied: job_id }
  * 
  * Authorization required:
  *    1). login
  *    2). admin priviledges OR /:username === logged in user
+ * 
+ * Requires:
+ *    1). An existing username
+ *    2). An existing job id
+ * 
+ * Returns:
+ *    - if no user is found, raises NotFoundError
+ *    - if the job id is greater than the max job id in the database, also raises NotFoundError
+ *    - otherwise, returns { applied: job_id }
  * 
  * Allows users to submit job applications
  */

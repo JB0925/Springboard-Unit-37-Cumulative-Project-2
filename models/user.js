@@ -233,7 +233,17 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 
-  /** Allow user to submit job applications for existing jobs */
+  /** Allow user to submit job applications for existing jobs 
+   * 
+   * Parameters:
+   *    username: req.params.username, a String
+   *    job_id: req.params.id, a Number
+   * 
+   * Returns:
+   *    - if no user is found, raises NotFoundError
+   *    - if the job id given is greater than the maximum job id, raises NotFoundError
+   *    - otherwise, returns { username: "tim", job_id: 15 }
+  */
 
   static async apply(username, job_id) {
     const doesJobExist = await db.query(
