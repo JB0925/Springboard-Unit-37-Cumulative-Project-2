@@ -240,6 +240,15 @@ class User {
       `SELECT MAX(id)
        FROM jobs`,
     );
+
+    const doesUserExist = await db.query(
+      `SELECT username
+       FROM users
+       WHERE username = $1`,
+       [username]
+    );
+
+    if (!doesUserExist.rows.length) throw new NotFoundError("The requested user does not exist.");
     
     const id = doesJobExist.rows[0].max;
     if (parseInt(job_id) > parseInt(id)) throw new NotFoundError(`Job id ${job_id} is greater than the max job id of ${id}`);

@@ -185,7 +185,8 @@ describe("GET /users", function () {
           firstName: "new",
           lastName: "Admin",
           email: "newAdmin@gmail.com",
-          isAdmin: true
+          isAdmin: true,
+          jobApplicationsSubmitted: []
         },
         {
           username: "u1",
@@ -193,6 +194,7 @@ describe("GET /users", function () {
           lastName: "U1L",
           email: "user1@user.com",
           isAdmin: false,
+          jobApplicationsSubmitted: []
         },
         {
           username: "u2",
@@ -200,6 +202,7 @@ describe("GET /users", function () {
           lastName: "U2L",
           email: "user2@user.com",
           isAdmin: false,
+          jobApplicationsSubmitted: []
         },
         {
           username: "u3",
@@ -207,6 +210,7 @@ describe("GET /users", function () {
           lastName: "U3L",
           email: "user3@user.com",
           isAdmin: false,
+          jobApplicationsSubmitted: []
         },
       ],
     });
@@ -244,6 +248,7 @@ describe("GET /users/:username", function () {
         lastName: "U1L",
         email: "user1@user.com",
         isAdmin: false,
+        jobApplicationsSubmitted: []
       },
     });
   });
@@ -259,6 +264,7 @@ describe("GET /users/:username", function () {
         lastName: "U1L",
         email: "user1@user.com",
         isAdmin: false,
+        jobApplicationsSubmitted: []
       },
     });
   });
@@ -446,5 +452,76 @@ describe("DELETE /users/:username", function () {
         .delete(`/users/nope`)
         .set("authorization", `Bearer ${adminToken}`);
     expect(resp.statusCode).toEqual(404);
+  });
+});
+
+/********************************************* POST /users/:username/jobs/:id */
+
+describe("POST /users/:username/jobs/:id", () => {
+  test("Given a valid job id, does the 'apply' route return the correct JSON response?", async() => {
+    const newJob = await db.query(
+      `INSERT INTO jobs
+       (title, salary, equity, company_handle)
+       VALUES
+       ('worker', 50000, 0.2, 'c3')`
+    );
+    
+    let jobId = await db.query(
+      `SELECT id
+       FROM jobs
+       WHERE title = $1`,
+       ["worker"]
+    );
+    jobId = jobId.rows[0].id;
+
+    const resp = await request(app).post(`/users/newAdmin/jobs/${jobId}`)
+                                   .set("authorization", `Bearer ${adminToken}`);
+    expect(resp.statusCode).toBe(200);
+  });
+
+  test("not found if user missing", async function () {
+    const newJob = await db.query(
+      `INSERT INTO jobs
+       (title, salary, equity, company_handle)
+       VALUES
+       ('worker', 50000, 0.2, 'c3')`
+    );
+    
+    let jobId = await db.query(
+      `SELECT id
+       FROM jobs
+       WHERE title = $1`,
+       ["worker"]
+    );
+    jobId = jobId.rows[0].id;
+
+    const resp = await request(app)
+        .post(`/users/carlos/jobs/${jobId}`)
+        .set("authorization", `Bearer ${adminToken}`);
+    expect(resp.statusCode).toEqual(404);
+    expect(resp.body.error.message).toEqual("The requested user does not exist.");
+  });
+
+  test("random logged in user cannot submit application for someone else", async function () {
+    const newJob = await db.query(
+      `INSERT INTO jobs
+       (title, salary, equity, company_handle)
+       VALUES
+       ('worker', 50000, 0.2, 'c3')`
+    );
+    
+    let jobId = await db.query(
+      `SELECT id
+       FROM jobs
+       WHERE title = $1`,
+       ["worker"]
+    );
+    jobId = jobId.rows[0].id;
+
+    const resp = await request(app)
+        .post(`/users/newAdmin/jobs/${jobId}`)
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(401);
+    expect(resp.body.error.message).toEqual("Unauthorized");
   });
 });
