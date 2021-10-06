@@ -260,7 +260,16 @@ describe("apply", () => {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
-      jobApplicationsSubmitted: [parseInt(jobId)]
+      jobApplicationsSubmitted: [jobId]
     });
+  });
+
+  test("not found if no such user", async function () {
+    try {
+      await User.apply("nope", 8);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
   });
 });

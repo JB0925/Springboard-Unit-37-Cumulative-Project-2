@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1633452764223" clover="3.2.0">
-  <project timestamp="1633452764223" name="All files">
-    <metrics statements="98" coveredstatements="96" conditionals="38" coveredconditionals="26" methods="21" coveredmethods="20" elements="157" coveredelements="142" complexity="0" loc="98" ncloc="98" packages="3" files="6" classes="6"/>
+<coverage generated="1633484013349" clover="3.2.0">
+  <project timestamp="1633484013349" name="All files">
+    <metrics statements="98" coveredstatements="96" conditionals="38" coveredconditionals="27" methods="21" coveredmethods="20" elements="157" coveredelements="143" complexity="0" loc="98" ncloc="98" packages="3" files="6" classes="6"/>
     <package name="express-jobly">
       <metrics statements="28" coveredstatements="26" conditionals="16" coveredconditionals="7" methods="6" coveredmethods="5"/>
       <file name="config.js" path="/Users/jessebrink/springboard/unit37/express-jobly/config.js">
@@ -32,10 +32,10 @@
       </file>
       <file name="expressError.js" path="/Users/jessebrink/springboard/unit37/express-jobly/expressError.js">
         <metrics statements="8" coveredstatements="7" conditionals="4" coveredconditionals="0" methods="5" coveredmethods="4"/>
-        <line num="9" count="7" type="stmt"/>
-        <line num="10" count="7" type="stmt"/>
-        <line num="11" count="7" type="stmt"/>
-        <line num="19" count="3" type="stmt"/>
+        <line num="9" count="8" type="stmt"/>
+        <line num="10" count="8" type="stmt"/>
+        <line num="11" count="8" type="stmt"/>
+        <line num="19" count="4" type="stmt"/>
         <line num="27" count="2" type="stmt"/>
         <line num="35" count="2" type="stmt"/>
         <line num="43" count="0" type="stmt"/>
@@ -56,7 +56,7 @@
       </file>
     </package>
     <package name="express-jobly.models">
-      <metrics statements="63" coveredstatements="63" conditionals="18" coveredconditionals="15" methods="13" coveredmethods="13"/>
+      <metrics statements="63" coveredstatements="63" conditionals="18" coveredconditionals="16" methods="13" coveredmethods="13"/>
       <file name="_testCommon.js" path="/Users/jessebrink/springboard/unit37/express-jobly/models/_testCommon.js">
         <metrics statements="11" coveredstatements="11" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
         <line num="1" count="1" type="stmt"/>
@@ -66,13 +66,13 @@
         <line num="10" count="1" type="stmt"/>
         <line num="12" count="1" type="stmt"/>
         <line num="18" count="1" type="stmt"/>
-        <line num="34" count="16" type="stmt"/>
-        <line num="38" count="16" type="stmt"/>
+        <line num="34" count="17" type="stmt"/>
+        <line num="38" count="17" type="stmt"/>
         <line num="42" count="1" type="stmt"/>
         <line num="46" count="1" type="stmt"/>
       </file>
       <file name="user.js" path="/Users/jessebrink/springboard/unit37/express-jobly/models/user.js">
-        <metrics statements="52" coveredstatements="52" conditionals="18" coveredconditionals="15" methods="9" coveredmethods="9"/>
+        <metrics statements="52" coveredstatements="52" conditionals="18" coveredconditionals="16" methods="9" coveredmethods="9"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
         <line num="5" count="1" type="stmt"/>
@@ -119,9 +119,9 @@
         <line num="224" count="2" type="stmt"/>
         <line num="231" count="2" type="stmt"/>
         <line num="233" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="239" count="1" type="stmt"/>
-        <line num="244" count="1" type="stmt"/>
-        <line num="245" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="239" count="2" type="stmt"/>
+        <line num="244" count="2" type="stmt"/>
+        <line num="245" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="247" count="1" type="stmt"/>
         <line num="256" count="1" type="stmt"/>
         <line num="260" count="1" type="stmt"/>
