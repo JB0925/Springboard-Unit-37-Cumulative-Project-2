@@ -1,11 +1,4 @@
 const db = require("../db");
-const {
-    commonBeforeAll,
-    commonBeforeEach,
-    commonAfterEach,
-    commonAfterAll,
-    u1Token
-} = require("./_testCommon");
 
 const { BadRequestError, NotFoundError } = require("../expressError");
 const Job = require("./job");

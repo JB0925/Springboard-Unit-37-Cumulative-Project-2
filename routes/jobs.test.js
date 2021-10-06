@@ -53,14 +53,21 @@ afterAll(async() => {
 /************************************** POST /jobs */
 
 describe("POST /jobs", function () {
-  const newCompany = {
-    title: "new",
-    salary: 76000,
-    equity: 0.05,
-    companyHandle: "c1"
-  };
+//   const newCompany = {
+//     title: "new",
+//     salary: 76000,
+//     equity: 0.05,
+//     companyHandle: "c1"
+//   };
 
   test("fails for non-admin users", async function () {
+    const newCompany = {
+        title: "new",
+        salary: 76000,
+        equity: 0.05,
+        companyHandle: "c1"
+    };
+
     const resp = await request(app)
         .post("/jobs")
         .send(newCompany)
@@ -70,6 +77,13 @@ describe("POST /jobs", function () {
   });
 
   test("works for admin users", async function () {
+    const newCompany = {
+        title: "new1",
+        salary: 76000,
+        equity: 0.05,
+        companyHandle: "c1"
+    };
+
     const resp = await request(app)
         .post("/jobs")
         .send(newCompany)
@@ -77,7 +91,7 @@ describe("POST /jobs", function () {
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
       job: {
-          title: "new",
+          title: "new1",
           salary: 76000,
           equity: "0.05",
           companyhandle: "c1"

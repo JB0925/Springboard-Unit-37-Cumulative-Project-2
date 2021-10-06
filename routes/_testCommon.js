@@ -73,6 +73,10 @@ async function commonAfterEach() {
 }
 
 async function commonAfterAll() {
+  await db.query("DELETE FROM users");
+  await db.query("DELETE FROM companies");
+  await db.query("DELETE FROM jobs");
+  await db.query("DELETE FROM applications");
   await db.end();
 }
 
