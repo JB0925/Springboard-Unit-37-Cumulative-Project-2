@@ -10,6 +10,7 @@ const {
 } = require("../expressError");
 
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
+const { json } = require("body-parser");
 
 /** Related functions for users. */
 
@@ -25,15 +26,14 @@ class User {
    */
   static async getJobsAppliedTo(username) {
     const jobs = await db.query(
-      `SELECT username, job_id
+      `SELECT username, JSON_AGG(job_id) AS jobsAppliedTo
         FROM applications
-        WHERE username = $1`,
+        WHERE username = $1
+        GROUP BY username`,
         [username],
     );
-    if (jobs) {
-      const appliedJobs = jobs.rows.map(j => j.job_id);
-      return appliedJobs;
-    };
+    if (jobs.rows.length) return jobs.rows[0].jobsappliedto;
+    return [];
   };
 
 
